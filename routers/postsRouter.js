@@ -1,4 +1,5 @@
 const express = require("express");
+const { body, validationResult, matchedData } = require("express-validator");
 const router = express.Router();
 const {
   getPosts,
@@ -6,6 +7,7 @@ const {
   addPost,
 } = require("../controllers/postsController");
 const { getError } = require("../libs/errorsHandler");
+const { validatePost } = require("../middleware/validators");
 
 router.get("/", async (req, res) => {
   try {
@@ -35,17 +37,23 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  if (!req.body.title || !req.body.content) {
-    console.error("Missing required fields in POST /");
+router.post("/", validatePost, async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.error(
+      "Error in POST /api/posts: Validation failed!\nDetails:\n",
+      errors.array()
+    );
     return res.status(400).json({
-      error: getError("MISSING_REQUIRED_FIELDS"),
+      error: getError("VALIDATION_ERROR"),
+      details: errors.array(),
     });
   }
 
   try {
-    const posts = await addPost(req.body);
-    console.log("POST /api/posts: Success\n", req.body);
+    const posts = await addPost(matchedData(req));
+    console.log("POST /api/posts: Success\n", matchedData(req));
     res.status(201).json(posts);
   } catch (error) {
     console.error(`Error in POST /api/posts: ${error.message}`);
