@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const postsRouter = require("./routers/postsRoute");
+const postsRouter = require("./routers/postsRouter");
 const PORT = 8000;
 
 app.use(cors());
