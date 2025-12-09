@@ -5,7 +5,7 @@ const {
   getPost,
   addPost,
 } = require("../controllers/postsController");
-const { getError } = require("../libs/errorHandler");
+const { getError } = require("../libs/errorsHandler");
 
 router.get("/", async (req, res) => {
   try {
